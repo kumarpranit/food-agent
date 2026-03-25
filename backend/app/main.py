@@ -1,9 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.schemas import NearbySearchRequest, NearbySearchResponse
-from app.services.google_places import search_nearby_restaurants
-from app.services.parser import parse_user_query
+from .schemas import NearbySearchRequest, NearbySearchResponse
+from .services.google_places import search_nearby_restaurants
+from .services.parser import parse_user_query
 
 app = FastAPI(title="Food Agent API")
 

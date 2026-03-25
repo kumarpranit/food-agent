@@ -1,6 +1,6 @@
 import math
 import requests
-from app.config import GOOGLE_MAPS_API_KEY, PLACES_NEARBY_URL
+from ..config import GOOGLE_MAPS_API_KEY, PLACES_NEARBY_URL
 
 
 def haversine_miles(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
@@ -29,9 +29,17 @@ def search_nearby_restaurants(lat: float, lng: float, radius: int = 2000, keywor
     if keyword:
         params["keyword"] = keyword
 
+    print("KEY PRESENT:", bool(GOOGLE_MAPS_API_KEY))
+    print("PLACES URL:", PLACES_NEARBY_URL)
+    print("PARAMS:", {k: v for k, v in params.items() if k != "key"})
+
     response = requests.get(PLACES_NEARBY_URL, params=params, timeout=30)
     response.raise_for_status()
     data = response.json()
+
+    print("GOOGLE STATUS:", data.get("status"))
+    print("GOOGLE ERROR:", data.get("error_message"))
+    print("RAW RESULT COUNT:", len(data.get("results", [])))
 
     cleaned = []
     for place in data.get("results", []):
