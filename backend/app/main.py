@@ -1,12 +1,20 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi import Header, HTTPException
+import os
 
 from .schemas import NearbySearchRequest, NearbySearchResponse
 from .services.google_places import search_nearby_restaurants
 from .services.parser import parse_user_query
+from .services.recommendation import rank_restaurants
 
 app = FastAPI(title="Food Agent API")
+BACKEND_API_KEY = os.getenv("BACKEND_API_KEY")
 
+def verify_api_key(x_api_key: str = Header(default="")):
+    if x_api_key != BACKEND_API_KEY:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -26,7 +34,8 @@ def health():
 
 
 @app.post("/restaurants/nearby", response_model=NearbySearchResponse)
-def nearby_restaurants(payload: NearbySearchRequest):
+def nearby_restaurants(payload: NearbySearchRequest, x_api_key: str = Header(default="")):
+    verify_api_key(x_api_key)
     parsed = parse_user_query(payload.keyword or "")
 
     radius = payload.radius if payload.radius is not None else parsed["radius"]
@@ -43,4 +52,10 @@ def nearby_restaurants(payload: NearbySearchRequest):
     if open_only:
         results = [r for r in results if r.get("open_now")]
 
-    return {"results": results}
+    ranked = rank_restaurants(results)
+    return {
+        "summary": "Best match based on rating, distance, and availability",
+        "top_pick": ranked["top_pick"],
+        "alternatives": ranked["alternatives"],
+        "results": ranked["all"]
+    }
