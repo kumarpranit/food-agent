@@ -158,7 +158,7 @@ export default function ChatPage() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "x-api-key": process.env.NEXT_PUBLIC_API_KEY ?? "",
+            "x-api-key": "super-secret-food-agent-key",
           },
           body: JSON.stringify({
             lat,
