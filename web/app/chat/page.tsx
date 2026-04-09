@@ -77,7 +77,7 @@ function buildRecommendation(items: Restaurant[]) {
 
   return {
     topPick: scored[0] ?? null,
-    alternatives: scored.slice(1, 3),
+    alternatives: scored.slice(1, 10),
     summary:
       scored.length > 0
         ? "Best match based on rating, distance, and availability."

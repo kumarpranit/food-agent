@@ -9,7 +9,7 @@ EXCLUDED_TYPES = {
     "gym", "lodging", "school", "church", "mosque",
     "hindu_temple", "synagogue", "cemetery", "funeral_home",
     "lawyer", "accounting", "insurance_agency", "real_estate_agency",
-    "car_dealer", "car_repair", "gas_station", "parking",
+    "car_dealer", "car_repair", "gas_station", "meal_catering","parking",
 }
 
 
