@@ -57,9 +57,20 @@ def search_nearby_restaurants(lat: float, lng: float, radius: int = 2000, keywor
             "lng": place_lng,
             "distance_miles": haversine_miles(lat, lng, place_lat, place_lng),
             "place_id": place.get("place_id"),
+            "types": place.get("types", []),
             "maps_url": f"https://www.google.com/maps/place/?q=place_id:{place.get('place_id')}",
         })
+    # Filter out non-restaurants based on place types
+    EXCLUDED_TYPES = {
+    "doctor", "hospital", "health", "dentist", "pharmacy",
+    "physiotherapist", "beauty_salon", "hair_care", "spa",
+    "gym", "lodging", "school", "church", "mosque"
+    }
 
+    cleaned = [
+    r for r in cleaned
+    if not any(t in EXCLUDED_TYPES for t in r.get("types", []))
+    ]
     cleaned.sort(
         key=lambda x: (
             0 if x["open_now"] else 1,
