@@ -2,12 +2,21 @@ import math
 import requests
 from ..config import GOOGLE_MAPS_API_KEY, PLACES_NEARBY_URL
 
+# Types that should never appear in restaurant results
+EXCLUDED_TYPES = {
+    "doctor", "hospital", "health", "dentist", "pharmacy",
+    "physiotherapist", "beauty_salon", "hair_care", "spa",
+    "gym", "lodging", "school", "church", "mosque",
+    "hindu_temple", "synagogue", "cemetery", "funeral_home",
+    "lawyer", "accounting", "insurance_agency", "real_estate_agency",
+    "car_dealer", "car_repair", "gas_station", "parking",
+}
+
 
 def haversine_miles(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     r = 3958.8
     dlat = math.radians(lat2 - lat1)
     dlon = math.radians(lon2 - lon1)
-
     a = (
         math.sin(dlat / 2) ** 2
         + math.cos(math.radians(lat1))
@@ -18,7 +27,29 @@ def haversine_miles(lat1: float, lon1: float, lat2: float, lon2: float) -> float
     return round(r * c, 2)
 
 
-def search_nearby_restaurants(lat: float, lng: float, radius: int = 2000, keyword: str | None = None):
+def is_real_restaurant(place: dict) -> bool:
+    """Return True only if the place is actually a food/drink establishment."""
+    types = set(place.get("types", []))
+
+    # Must have at least one food-related type
+    FOOD_TYPES = {
+        "restaurant", "food", "cafe", "bakery", "bar",
+        "meal_takeaway", "meal_delivery", "night_club",
+    }
+    has_food_type = bool(types & FOOD_TYPES)
+
+    # Must not have any excluded types
+    has_excluded = bool(types & EXCLUDED_TYPES)
+
+    return has_food_type and not has_excluded
+
+
+def search_nearby_restaurants(
+    lat: float,
+    lng: float,
+    radius: int = 2000,
+    keyword: str | None = None,
+):
     params = {
         "location": f"{lat},{lng}",
         "radius": radius,
@@ -43,6 +74,11 @@ def search_nearby_restaurants(lat: float, lng: float, radius: int = 2000, keywor
 
     cleaned = []
     for place in data.get("results", []):
+        # ✅ Skip anything that isn't actually a food place
+        if not is_real_restaurant(place):
+            print(f"FILTERED OUT: {place.get('name')} — types: {place.get('types')}")
+            continue
+
         place_lat = place["geometry"]["location"]["lat"]
         place_lng = place["geometry"]["location"]["lng"]
 
@@ -57,20 +93,12 @@ def search_nearby_restaurants(lat: float, lng: float, radius: int = 2000, keywor
             "lng": place_lng,
             "distance_miles": haversine_miles(lat, lng, place_lat, place_lng),
             "place_id": place.get("place_id"),
-            "types": place.get("types", []),
             "maps_url": f"https://www.google.com/maps/place/?q=place_id:{place.get('place_id')}",
+            "types": place.get("types", []),
         })
-    # Filter out non-restaurants based on place types
-    EXCLUDED_TYPES = {
-    "doctor", "hospital", "health", "dentist", "pharmacy",
-    "physiotherapist", "beauty_salon", "hair_care", "spa",
-    "gym", "lodging", "school", "church", "mosque"
-    }
 
-    cleaned = [
-    r for r in cleaned
-    if not any(t in EXCLUDED_TYPES for t in r.get("types", []))
-    ]
+    print(f"CLEANED RESULT COUNT (after filter): {len(cleaned)}")
+
     cleaned.sort(
         key=lambda x: (
             0 if x["open_now"] else 1,
