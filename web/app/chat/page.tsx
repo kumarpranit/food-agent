@@ -8,11 +8,13 @@ type Restaurant = {
   name: string;
   address?: string;
   rating?: number;
+  price_level?: number;
   open_now?: boolean | null;
   maps_url: string;
   distance_miles?: number;
   match_reasons?: string[];
   score?: number;
+  estimated_wait_minutes?: number | null;
 };
 
 const quickSuggestions = [
@@ -477,6 +479,11 @@ export default function ChatPage() {
                         ? "Closed"
                         : "Hours unavailable"}
                     </span>
+                    {topPick.estimated_wait_minutes != null && (
+                      <span className="rounded-full bg-purple-50 px-3 py-1 text-purple-700 font-medium">
+                        ⏱ Est. {topPick.estimated_wait_minutes} min wait
+                      </span>
+                    )}
                   </div>
 
                   {topPick.match_reasons && topPick.match_reasons.length > 0 && (
@@ -546,6 +553,11 @@ export default function ChatPage() {
                               ? "Closed"
                               : "Hours unavailable"}
                           </span>
+                          {r.estimated_wait_minutes != null && (
+                            <span className="rounded-full bg-purple-50 px-3 py-1 text-purple-700 font-medium">
+                              ⏱ Est. {r.estimated_wait_minutes} min wait
+                            </span>
+                          )}
                         </div>
 
                         {r.match_reasons && r.match_reasons.length > 0 && (

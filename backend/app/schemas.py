@@ -24,6 +24,7 @@ class RestaurantResult(BaseModel):
     distance_miles: float
     place_id: str
     maps_url: str
+    estimated_wait_minutes: Optional[int] = None
 
 
 class NearbySearchResponse(BaseModel):
