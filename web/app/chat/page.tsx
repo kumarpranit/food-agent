@@ -66,13 +66,14 @@ function buildRecommendation(items: Restaurant[]) {
     const scoreDiff = (b.score ?? 0) - (a.score ?? 0);
     if (scoreDiff !== 0) return scoreDiff;
 
-    const ratingA = a.rating ?? 0;
-    const ratingB = b.rating ?? 0;
-    if (ratingB !== ratingA) return ratingB - ratingA;
-
+    // Tiebreak: closer first, then higher rated
     const distA = a.distance_miles ?? 999;
     const distB = b.distance_miles ?? 999;
-    return distA - distB;
+    if (distA !== distB) return distA - distB;
+
+    const ratingA = a.rating ?? 0;
+    const ratingB = b.rating ?? 0;
+    return ratingB - ratingA;
   });
 
   return {
@@ -460,11 +461,6 @@ export default function ChatPage() {
                         ? "Closed"
                         : "Hours unavailable"}
                     </span>
-                    {typeof topPick.score === "number" && (
-                      <span className="rounded-full bg-orange-100 px-3 py-1 text-orange-700">
-                        Match score: {topPick.score}
-                      </span>
-                    )}
                   </div>
 
                   {topPick.match_reasons && topPick.match_reasons.length > 0 && (

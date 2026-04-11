@@ -27,16 +27,16 @@ def score_restaurant(r):
         score += 1
         reasons.append("Popular spot")
 
-    # Distance
+    # Distance — weighted higher so closer places beat slightly better-rated far ones
     dist = r.get("distance_miles") or 10
     if dist <= 0.5:
-        score += 4
+        score += 6
         reasons.append("Very close")
     elif dist <= 1:
-        score += 3
+        score += 5
         reasons.append("Close by")
     elif dist <= 2:
-        score += 2
+        score += 3
         reasons.append("Nearby")
     elif dist <= 3:
         score += 1

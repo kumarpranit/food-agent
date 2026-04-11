@@ -51,6 +51,9 @@ def nearby_restaurants(
     min_price = payload.min_price if payload.min_price is not None else parsed.get("min_price")
     max_price = payload.max_price if payload.max_price is not None else parsed.get("max_price")
 
+    # Place type: explicit payload takes priority over NLP-parsed value
+    place_type = payload.place_type if payload.place_type is not None else parsed.get("place_type", "restaurant")
+
     results = search_nearby_restaurants(
         lat=payload.lat,
         lng=payload.lng,
@@ -58,6 +61,7 @@ def nearby_restaurants(
         keyword=keyword,
         min_price=min_price,
         max_price=max_price,
+        place_type=place_type,
     )
 
     # ✅ FIX: this filter was outside the function before — now it's in the right place

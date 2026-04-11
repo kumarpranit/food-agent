@@ -11,6 +11,7 @@ def parse_user_query(query: str) -> Dict[str, Any]:
         "open_now": False,
         "min_price": None,
         "max_price": None,
+        "place_type": "restaurant",  # default
     }
 
     mile_match = re.search(r"(\d+)\s*(mile|miles)\b", text)
@@ -29,6 +30,10 @@ def parse_user_query(query: str) -> Dict[str, Any]:
         parsed["max_price"] = 2
     elif re.search(r"\bfancy\b|\bexpensive\b|\bupscale\b|\bfine dining\b|\bluxury\b|\bpremium\b", text):
         parsed["min_price"] = 3
+
+    # Place type detection — override to "cafe" for coffee/cafe searches
+    if re.search(r"\bcafe\b|\bcafes\b|\bcoffee\b|\bstarbucks\b|\blatte\b|\bespresso\b|\bcappuccino\b|\bworking cafe\b|\bcoffee shop\b|\bcoffee shops\b", text):
+        parsed["place_type"] = "cafe"
 
     noise_words = [
         "near me",

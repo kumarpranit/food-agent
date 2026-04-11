@@ -9,6 +9,7 @@ class NearbySearchRequest(BaseModel):
     keyword: Optional[str] = None
     min_price: Optional[int] = None  # 0–4 (Google Places price scale)
     max_price: Optional[int] = None  # 0–4
+    place_type: Optional[str] = None  # e.g. "restaurant", "cafe"
 
 
 class RestaurantResult(BaseModel):

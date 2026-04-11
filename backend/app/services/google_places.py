@@ -51,11 +51,12 @@ def search_nearby_restaurants(
     keyword: str | None = None,
     min_price: int | None = None,
     max_price: int | None = None,
+    place_type: str = "restaurant",
 ):
     params = {
         "location": f"{lat},{lng}",
         "radius": radius,
-        "type": "restaurant",
+        "type": place_type,
         "key": GOOGLE_MAPS_API_KEY,
     }
 
