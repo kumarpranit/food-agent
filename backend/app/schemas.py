@@ -7,6 +7,8 @@ class NearbySearchRequest(BaseModel):
     lng: float
     radius: Optional[int] = None
     keyword: Optional[str] = None
+    min_price: Optional[int] = None  # 0–4 (Google Places price scale)
+    max_price: Optional[int] = None  # 0–4
 
 
 class RestaurantResult(BaseModel):

@@ -47,11 +47,17 @@ def nearby_restaurants(
     keyword = parsed["keyword"]
     open_only = parsed["open_now"]
 
+    # Price level: explicit payload takes priority over NLP-parsed value
+    min_price = payload.min_price if payload.min_price is not None else parsed.get("min_price")
+    max_price = payload.max_price if payload.max_price is not None else parsed.get("max_price")
+
     results = search_nearby_restaurants(
         lat=payload.lat,
         lng=payload.lng,
         radius=radius,
         keyword=keyword,
+        min_price=min_price,
+        max_price=max_price,
     )
 
     # ✅ FIX: this filter was outside the function before — now it's in the right place

@@ -49,6 +49,8 @@ def search_nearby_restaurants(
     lng: float,
     radius: int = 2000,
     keyword: str | None = None,
+    min_price: int | None = None,
+    max_price: int | None = None,
 ):
     params = {
         "location": f"{lat},{lng}",
@@ -59,6 +61,10 @@ def search_nearby_restaurants(
 
     if keyword:
         params["keyword"] = keyword
+    if min_price is not None:
+        params["minprice"] = min_price
+    if max_price is not None:
+        params["maxprice"] = max_price
 
     print("KEY PRESENT:", bool(GOOGLE_MAPS_API_KEY))
     print("PLACES URL:", PLACES_NEARBY_URL)

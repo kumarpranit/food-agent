@@ -9,6 +9,8 @@ def parse_user_query(query: str) -> Dict[str, Any]:
         "keyword": query.strip(),
         "radius": 3218,   # default = 2 miles in meters
         "open_now": False,
+        "min_price": None,
+        "max_price": None,
     }
 
     mile_match = re.search(r"(\d+)\s*(mile|miles)\b", text)
@@ -19,6 +21,15 @@ def parse_user_query(query: str) -> Dict[str, Any]:
     if "open now" in text or "open" in text:
         parsed["open_now"] = True
 
+    # Price level detection from natural language
+    if re.search(r"\bcheap\b|\bbudget\b|\binexpensive\b|\baffordable\b", text):
+        parsed["max_price"] = 1
+    elif re.search(r"\bmoderate\b|\bmid.range\b|\breasonable\b", text):
+        parsed["min_price"] = 1
+        parsed["max_price"] = 2
+    elif re.search(r"\bfancy\b|\bexpensive\b|\bupscale\b|\bfine dining\b|\bluxury\b|\bpremium\b", text):
+        parsed["min_price"] = 3
+
     noise_words = [
         "near me",
         "open now",
@@ -27,6 +38,19 @@ def parse_user_query(query: str) -> Dict[str, Any]:
         "restaurants",
         "food",
         "within",
+        # price-related words (already parsed above)
+        "cheap",
+        "budget",
+        "inexpensive",
+        "affordable",
+        "moderate",
+        "mid-range",
+        "fancy",
+        "expensive",
+        "upscale",
+        "fine dining",
+        "luxury",
+        "premium",
     ]
 
     cleaned = text

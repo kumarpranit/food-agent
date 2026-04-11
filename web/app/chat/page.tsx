@@ -96,6 +96,17 @@ export default function ChatPage() {
   const [radius, setRadius] = useState(3218);
   const [openOnly, setOpenOnly] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [priceLevel, setPriceLevel] = useState<string>("");
+  const [searchHistory, setSearchHistory] = useState<string[]>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        return JSON.parse(localStorage.getItem("foodAgentHistory") || "[]");
+      } catch {
+        return [];
+      }
+    }
+    return [];
+  });
 
   const [rawResults, setRawResults] = useState<Restaurant[]>([]);
   const [topPick, setTopPick] = useState<Restaurant | null>(null);
@@ -143,6 +154,14 @@ export default function ChatPage() {
     }
   }, [filteredResults, openOnly]);
 
+  const saveToHistory = (q: string) => {
+    setSearchHistory((prev) => {
+      const next = [q, ...prev.filter((h) => h !== q)].slice(0, 5);
+      localStorage.setItem("foodAgentHistory", JSON.stringify(next));
+      return next;
+    });
+  };
+
   const handleSearch = async (preset?: string) => {
     if (lat === null || lng === null) return;
 
@@ -165,6 +184,10 @@ export default function ChatPage() {
             lng,
             radius,
             keyword: finalQuery,
+            ...(priceLevel === "1" && { min_price: 1, max_price: 1 }),
+            ...(priceLevel === "2" && { min_price: 2, max_price: 2 }),
+            ...(priceLevel === "3" && { min_price: 3, max_price: 3 }),
+            ...(priceLevel === "4" && { min_price: 4, max_price: 4 }),
           }),
         }
       );
@@ -189,6 +212,7 @@ export default function ChatPage() {
       }
 
       setQuery(finalQuery);
+      saveToHistory(finalQuery);
     } catch (error) {
       console.error("Search failed:", error);
       setRawResults([]);
@@ -292,6 +316,18 @@ export default function ChatPage() {
               />
               <span className="text-gray-700">Open Now</span>
             </label>
+
+            <select
+              className="rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm outline-none transition focus:ring-2 focus:ring-orange-300"
+              value={priceLevel}
+              onChange={(e) => setPriceLevel(e.target.value)}
+            >
+              <option value="">Any Price</option>
+              <option value="1">$ · Budget</option>
+              <option value="2">$$ · Moderate</option>
+              <option value="3">$$$ · Upscale</option>
+              <option value="4">$$$$ · Fine Dining</option>
+            </select>
           </div>
 
           <div className="flex flex-col gap-3 md:flex-row">
@@ -324,6 +360,40 @@ export default function ChatPage() {
               </button>
             ))}
           </div>
+
+          {searchHistory.length > 0 && (
+            <div className="mt-4 border-t border-gray-100 pt-4">
+              <div className="mb-2 flex items-center justify-between">
+                <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">
+                  Recent searches
+                </span>
+                <button
+                  onClick={() => {
+                    setSearchHistory([]);
+                    localStorage.removeItem("foodAgentHistory");
+                  }}
+                  className="text-xs text-gray-400 hover:text-red-500 transition"
+                >
+                  Clear
+                </button>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {searchHistory.map((h) => (
+                  <button
+                    key={h}
+                    onClick={() => {
+                      setQuery(h);
+                      handleSearch(h);
+                    }}
+                    className="flex items-center gap-1 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-sm text-gray-600 transition hover:bg-gray-50 hover:border-gray-300"
+                  >
+                    <span className="text-gray-400">🕐</span>
+                    {h}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </section>
 
         <section className="mt-8">
