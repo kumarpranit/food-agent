@@ -94,6 +94,7 @@ export default function ChatPage() {
   const [lat, setLat] = useState<number | null>(34.0522);
   const [lng, setLng] = useState<number | null>(-118.2437);
   const [locationReady, setLocationReady] = useState(false);
+  const [locationDenied, setLocationDenied] = useState(false);
   const [radius, setRadius] = useState(3218);
   const [openOnly, setOpenOnly] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -126,13 +127,24 @@ export default function ChatPage() {
   }, []);
 
   useEffect(() => {
+    if (!navigator.geolocation) {
+      setLocationDenied(true);
+      setLocationReady(true);
+      return;
+    }
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         setLat(pos.coords.latitude);
         setLng(pos.coords.longitude);
         setLocationReady(true);
+        setLocationDenied(false);
       },
-      () => setLocationReady(true)
+      () => {
+        // Permission denied or unavailable — keep default coords but warn user
+        setLocationDenied(true);
+        setLocationReady(true);
+      },
+      { timeout: 8000 }
     );
   }, []);
 
@@ -272,8 +284,12 @@ export default function ChatPage() {
             <p className="mt-2 sm:mt-3 max-w-2xl text-sm sm:text-lg text-gray-600 hidden sm:block">
               Find nearby places to eat with smarter recommendations, not just a long list.
             </p>
-            <p className="mt-2 sm:mt-4 text-xs sm:text-sm text-gray-500">
-              {locationReady ? "📍 Location detected" : "📍 Getting your location..."}
+            <p className={`mt-2 sm:mt-4 text-xs sm:text-sm ${locationDenied ? "text-amber-600" : "text-gray-500"}`}>
+              {!locationReady
+                ? "📍 Getting your location..."
+                : locationDenied
+                ? "⚠️ Location access denied — enable location for accurate results"
+                : "📍 Location detected"}
             </p>
           </div>
 

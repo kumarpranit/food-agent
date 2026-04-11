@@ -1,5 +1,6 @@
 import math
 import requests
+from urllib.parse import quote_plus
 from ..config import GOOGLE_MAPS_API_KEY, PLACES_NEARBY_URL
 
 # Types that should never appear in restaurant results
@@ -100,7 +101,11 @@ def search_nearby_restaurants(
             "lng": place_lng,
             "distance_miles": haversine_miles(lat, lng, place_lat, place_lng),
             "place_id": place.get("place_id"),
-            "maps_url": f"https://www.google.com/maps/place/?q=place_id:{place.get('place_id')}",
+            "maps_url": (
+                f"https://www.google.com/maps/search/?api=1"
+                f"&query={quote_plus(place.get('name', ''))}"
+                f"&query_place_id={place.get('place_id')}"
+            ),
             "types": place.get("types", []),
         })
 
