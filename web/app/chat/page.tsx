@@ -259,47 +259,47 @@ export default function ChatPage() {
       <div className="absolute top-40 right-0 h-80 w-80 rounded-full bg-pink-200/20 blur-3xl" />
       <div className="absolute bottom-0 left-1/3 h-72 w-72 rounded-full bg-yellow-200/30 blur-3xl" />
 
-      <div className="relative max-w-6xl mx-auto px-6 py-10">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <div className="inline-flex items-center gap-2 rounded-full bg-white/70 px-4 py-2 text-sm text-gray-700 shadow-sm ring-1 ring-black/5 backdrop-blur">
+      <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
+        <div className="flex items-start justify-between gap-4 mb-6 sm:mb-8">
+          <div className="min-w-0">
+            <div className="inline-flex items-center gap-2 rounded-full bg-white/70 px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm text-gray-700 shadow-sm ring-1 ring-black/5 backdrop-blur">
               <span>🍴</span>
               <span>AI-powered food discovery</span>
             </div>
-            <h1 className="mt-5 text-5xl font-bold tracking-tight text-gray-900">
+            <h1 className="mt-3 sm:mt-5 text-3xl sm:text-5xl font-bold tracking-tight text-gray-900">
               Food Agent
             </h1>
-            <p className="mt-3 max-w-2xl text-lg text-gray-600">
+            <p className="mt-2 sm:mt-3 max-w-2xl text-sm sm:text-lg text-gray-600 hidden sm:block">
               Find nearby places to eat with smarter recommendations, not just a long list.
             </p>
-            <p className="mt-4 text-sm text-gray-500">
+            <p className="mt-2 sm:mt-4 text-xs sm:text-sm text-gray-500">
               {locationReady ? "📍 Location detected" : "📍 Getting your location..."}
             </p>
           </div>
 
-          <div className="flex items-center gap-3 shrink-0">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <div className="hidden sm:flex flex-col items-end">
               <span className="text-xs text-gray-500">Signed in as</span>
               <span className="text-sm font-medium text-gray-800 max-w-[180px] truncate">
                 {user?.email ?? user?.phone ?? "User"}
               </span>
             </div>
-            <div className="h-9 w-9 rounded-full bg-orange-500 flex items-center justify-center text-white text-sm font-semibold uppercase">
+            <div className="h-8 w-8 sm:h-9 sm:w-9 rounded-full bg-orange-500 flex items-center justify-center text-white text-xs sm:text-sm font-semibold uppercase">
               {(user?.email ?? user?.phone ?? "U")[0]}
             </div>
             <button
               onClick={handleLogout}
-              className="rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm text-gray-600 shadow-sm hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-all"
+              className="rounded-lg sm:rounded-xl border border-gray-200 bg-white px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm text-gray-600 shadow-sm hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-all"
             >
               Sign out
             </button>
           </div>
         </div>
 
-        <section className="rounded-3xl border border-white/60 bg-white/65 p-5 shadow-xl shadow-orange-100/50 backdrop-blur-xl">
-          <div className="flex flex-wrap gap-3 mb-4">
+        <section className="rounded-2xl sm:rounded-3xl border border-white/60 bg-white/65 p-4 sm:p-5 shadow-xl shadow-orange-100/50 backdrop-blur-xl">
+          <div className="flex flex-wrap gap-2 sm:gap-3 mb-4">
             <select
-              className="rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm outline-none transition focus:ring-2 focus:ring-orange-300"
+              className="rounded-xl border border-gray-200 bg-white px-3 py-2 sm:px-4 sm:py-3 text-sm shadow-sm outline-none transition focus:ring-2 focus:ring-orange-300"
               value={radius}
               onChange={(e) => setRadius(Number(e.target.value))}
             >
@@ -308,7 +308,7 @@ export default function ChatPage() {
               <option value={8047}>5 miles</option>
             </select>
 
-            <label className="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm cursor-pointer">
+            <label className="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-2 sm:px-4 sm:py-3 text-sm shadow-sm cursor-pointer">
               <input
                 type="checkbox"
                 checked={openOnly}
@@ -319,7 +319,7 @@ export default function ChatPage() {
             </label>
 
             <select
-              className="rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm outline-none transition focus:ring-2 focus:ring-orange-300"
+              className="rounded-xl border border-gray-200 bg-white px-3 py-2 sm:px-4 sm:py-3 text-sm shadow-sm outline-none transition focus:ring-2 focus:ring-orange-300"
               value={priceLevel}
               onChange={(e) => setPriceLevel(e.target.value)}
             >
@@ -331,10 +331,10 @@ export default function ChatPage() {
             </select>
           </div>
 
-          <div className="flex flex-col gap-3 md:flex-row">
+          <div className="flex flex-col gap-2 sm:gap-3 sm:flex-row">
             <input
-              className="flex-1 rounded-2xl border border-gray-200 bg-white px-5 py-4 text-base shadow-sm outline-none transition placeholder:text-gray-400 focus:ring-2 focus:ring-orange-300"
-              placeholder="Try: cheap healthy dinner, sushi, coffee, tacos..."
+              className="flex-1 rounded-2xl border border-gray-200 bg-white px-4 py-3 sm:px-5 sm:py-4 text-sm sm:text-base shadow-sm outline-none transition placeholder:text-gray-400 focus:ring-2 focus:ring-orange-300"
+              placeholder="Try: cheap sushi, coffee shops, tacos..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={(e) => {
@@ -344,7 +344,7 @@ export default function ChatPage() {
             <button
               onClick={() => handleSearch()}
               disabled={loading}
-              className="rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 px-7 py-4 font-semibold text-white shadow-lg shadow-orange-200 transition hover:scale-[1.02] hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-70"
+              className="rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 px-6 py-3 sm:px-7 sm:py-4 font-semibold text-sm sm:text-base text-white shadow-lg shadow-orange-200 transition hover:scale-[1.02] hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-70"
             >
               {loading ? "Searching..." : "Search"}
             </button>
@@ -428,7 +428,7 @@ export default function ChatPage() {
                   </span>
                 </div>
 
-                <div className="rounded-3xl border-2 border-orange-300 bg-white p-6 shadow-xl">
+                <div className="rounded-2xl sm:rounded-3xl border-2 border-orange-300 bg-white p-4 sm:p-6 shadow-xl">
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <h3 className="text-2xl font-bold text-gray-900">{topPick.name}</h3>
@@ -560,7 +560,7 @@ export default function ChatPage() {
               )}
             </>
           ) : (
-            <div className="rounded-3xl border border-dashed border-orange-200 bg-white/60 px-8 py-14 text-center shadow-sm backdrop-blur">
+            <div className="rounded-2xl sm:rounded-3xl border border-dashed border-orange-200 bg-white/60 px-5 py-10 sm:px-8 sm:py-14 text-center shadow-sm backdrop-blur">
               <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-orange-100 text-3xl">
                 🍜
               </div>
