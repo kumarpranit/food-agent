@@ -6,6 +6,7 @@ from .schemas import NearbySearchRequest, NearbySearchResponse
 from .services.google_places import search_nearby_restaurants
 from .services.parser import parse_user_query
 from .services.recommendation import rank_restaurants
+from .services.place_details import get_place_details
 
 app = FastAPI(title="Food Agent API")
 BACKEND_API_KEY = os.getenv("BACKEND_API_KEY")
@@ -32,6 +33,19 @@ app.add_middleware(
 @app.get("/health")
 def health():
     return {"status": "ok"}
+
+
+@app.get("/restaurant/{place_id}/details")
+def restaurant_details(
+    place_id: str,
+    x_api_key: str = Header(default=""),
+):
+    """
+    Fetch website and menu URL for a single restaurant.
+    Called on demand (top pick only) to avoid excess API usage.
+    """
+    verify_api_key(x_api_key)
+    return get_place_details(place_id)
 
 
 @app.post("/restaurants/nearby", response_model=NearbySearchResponse)

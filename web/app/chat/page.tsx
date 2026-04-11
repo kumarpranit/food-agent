@@ -11,10 +11,17 @@ type Restaurant = {
   price_level?: number;
   open_now?: boolean | null;
   maps_url: string;
+  place_id: string;
   distance_miles?: number;
   match_reasons?: string[];
   score?: number;
   estimated_wait_minutes?: number | null;
+};
+
+type PlaceDetails = {
+  website?: string | null;
+  menu_url?: string | null;
+  phone?: string | null;
 };
 
 const quickSuggestions = [
@@ -116,6 +123,7 @@ export default function ChatPage() {
   const [topPick, setTopPick] = useState<Restaurant | null>(null);
   const [alternatives, setAlternatives] = useState<Restaurant[]>([]);
   const [summary, setSummary] = useState("");
+  const [topPickDetails, setTopPickDetails] = useState<PlaceDetails | null>(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -168,6 +176,21 @@ export default function ChatPage() {
       setSummary(built.summary);
     }
   }, [filteredResults, openOnly]);
+
+  // Fetch Place Details (website / menu URL) for the top pick only
+  useEffect(() => {
+    if (!topPick?.place_id) {
+      setTopPickDetails(null);
+      return;
+    }
+    setTopPickDetails(null); // clear while loading
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/restaurant/${topPick.place_id}/details`, {
+      headers: { "x-api-key": "super-secret-food-agent-key" },
+    })
+      .then((r) => r.json())
+      .then((d) => setTopPickDetails(d))
+      .catch(() => setTopPickDetails(null));
+  }, [topPick?.place_id]);
 
   const saveToHistory = (q: string) => {
     setSearchHistory((prev) => {
@@ -499,14 +522,38 @@ export default function ChatPage() {
                     </div>
                   )}
 
-                  <a
-                    href={topPick.maps_url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="mt-5 inline-block text-sm font-medium text-orange-600 transition hover:text-orange-700 hover:underline"
-                  >
-                    View on Maps →
-                  </a>
+                  <div className="mt-5 flex flex-wrap gap-4 items-center">
+                    <a
+                      href={topPick.maps_url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-sm font-medium text-orange-600 transition hover:text-orange-700 hover:underline"
+                    >
+                      View on Maps →
+                    </a>
+                    {topPickDetails?.menu_url ? (
+                      <a
+                        href={topPickDetails.menu_url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1.5 rounded-xl bg-orange-500 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-orange-600"
+                      >
+                        🍽️ View Menu
+                      </a>
+                    ) : topPickDetails !== null ? (
+                      <span className="text-xs text-gray-400">Menu not available online</span>
+                    ) : (
+                      <span className="text-xs text-gray-400 animate-pulse">Loading menu…</span>
+                    )}
+                    {topPickDetails?.phone && (
+                      <a
+                        href={`tel:${topPickDetails.phone}`}
+                        className="text-sm text-gray-500 hover:text-gray-700 transition"
+                      >
+                        📞 {topPickDetails.phone}
+                      </a>
+                    )}
+                  </div>
                 </div>
               </div>
 

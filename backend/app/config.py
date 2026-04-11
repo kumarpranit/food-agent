@@ -9,6 +9,7 @@ load_dotenv(dotenv_path=ENV_PATH)
 
 GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
 PLACES_NEARBY_URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
+PLACES_DETAILS_URL = "https://maps.googleapis.com/maps/api/place/details/json"
 
 print("ENV PATH:", ENV_PATH)
 print("ENV FILE EXISTS:", ENV_PATH.exists())
