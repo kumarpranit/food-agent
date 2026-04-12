@@ -127,16 +127,7 @@ export default function ChatPage() {
     return () => window.removeEventListener("resize", update);
   }, []);
   const [priceLevel, setPriceLevel] = useState<string>("");
-  const [searchHistory, setSearchHistory] = useState<string[]>(() => {
-    if (typeof window !== "undefined") {
-      try {
-        return JSON.parse(localStorage.getItem("foodAgentHistory") || "[]");
-      } catch {
-        return [];
-      }
-    }
-    return [];
-  });
+  const [searchHistory, setSearchHistory] = useState<string[]>([]);
 
   const [rawResults, setRawResults] = useState<Restaurant[]>([]);
   const [topPick, setTopPick] = useState<Restaurant | null>(null);
@@ -151,6 +142,9 @@ export default function ChatPage() {
       } else {
         setUser(session.user);
         setAuthLoading(false);
+        // Load search history synced to this account
+        const saved = session.user.user_metadata?.search_history;
+        if (Array.isArray(saved)) setSearchHistory(saved);
       }
     });
   }, []);
@@ -214,7 +208,7 @@ export default function ChatPage() {
   const saveToHistory = (q: string) => {
     setSearchHistory((prev) => {
       const next = [q, ...prev.filter((h) => h !== q)].slice(0, 5);
-      localStorage.setItem("foodAgentHistory", JSON.stringify(next));
+      supabase.auth.updateUser({ data: { search_history: next } });
       return next;
     });
   };
@@ -525,7 +519,7 @@ export default function ChatPage() {
                 <button
                   onClick={() => {
                     setSearchHistory([]);
-                    localStorage.removeItem("foodAgentHistory");
+                    supabase.auth.updateUser({ data: { search_history: [] } });
                   }}
                   className="text-xs text-gray-400 hover:text-red-500 transition"
                 >
