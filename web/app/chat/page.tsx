@@ -308,17 +308,17 @@ export default function ChatPage() {
       <div className="absolute top-40 right-0 h-80 w-80 rounded-full bg-pink-200/20 blur-3xl" />
       <div className="absolute bottom-0 left-1/3 h-72 w-72 rounded-full bg-yellow-200/30 blur-3xl" />
 
-      {/* Escalator cuisine strips — only on 2xl+ screens */}
+      {/* Escalator cuisine strips — emoji circles on xl (1280px+), full pills on 2xl (1536px+) */}
       {(() => {
         const leftPills  = [
-          { emoji: "🍕", label: "Italian",   q: "italian"      },
-          { emoji: "🌮", label: "Mexican",   q: "mexican"      },
-          { emoji: "🍔", label: "Burgers",   q: "burgers"      },
-          { emoji: "🥗", label: "Healthy",   q: "healthy food" },
-          { emoji: "🍜", label: "Noodles",   q: "noodles ramen"},
-          { emoji: "🥞", label: "Breakfast", q: "breakfast"    },
-          { emoji: "🫕", label: "Soup",      q: "soup"         },
-          { emoji: "🥙", label: "Wraps",     q: "wraps"        },
+          { emoji: "🍕", label: "Italian",        q: "italian"       },
+          { emoji: "🌮", label: "Mexican",        q: "mexican"       },
+          { emoji: "🍔", label: "Burgers",        q: "burgers"       },
+          { emoji: "🥗", label: "Healthy",        q: "healthy food"  },
+          { emoji: "🍜", label: "Noodles",        q: "noodles ramen" },
+          { emoji: "🥞", label: "Breakfast",      q: "breakfast"     },
+          { emoji: "🫕", label: "Soup",           q: "soup"          },
+          { emoji: "🥙", label: "Wraps",          q: "wraps"         },
         ];
         const rightPills = [
           { emoji: "🍣", label: "Sushi",          q: "sushi"         },
@@ -327,41 +327,60 @@ export default function ChatPage() {
           { emoji: "🥩", label: "Steakhouse",     q: "steakhouse"    },
           { emoji: "🌯", label: "Mediterranean",  q: "mediterranean" },
           { emoji: "🍦", label: "Desserts",        q: "desserts"      },
-          { emoji: "🍱", label: "Bento",           q: "japanese food" },
-          { emoji: "🧆", label: "Middle Eastern", q: "middle eastern"},
+          { emoji: "🍱", label: "Japanese",        q: "japanese food" },
+          { emoji: "🧆", label: "Mid. Eastern",   q: "middle eastern"},
         ];
 
-        const PillButton = ({ emoji, label, q }: { emoji: string; label: string; q: string }) => (
-          <button
-            onClick={() => { setQuery(q); handleSearch(q); }}
-            className="flex items-center gap-2 rounded-2xl border border-white/70 bg-white/80 px-3 py-2.5 text-sm font-medium text-gray-700 shadow-md backdrop-blur-sm transition hover:bg-white hover:scale-105 hover:shadow-lg w-full mb-3"
-          >
-            <span className="text-xl">{emoji}</span>
-            <span>{label}</span>
-          </button>
+        const Strip = ({ pills, dir, side }: {
+          pills: typeof leftPills;
+          dir: "scroll-up" | "scroll-down";
+          side: "left" | "right";
+        }) => (
+          <>
+            {/* xl: emoji circles only (fits ~70px gutter) */}
+            <div
+              className={`hidden xl:block 2xl:hidden fixed ${side === "left" ? "left-2" : "right-2"} top-20 z-10`}
+              style={{ width: 48, height: "calc(100vh - 96px)", overflow: "hidden" }}
+            >
+              <div className={dir} style={{ willChange: "transform" }}>
+                {[...pills, ...pills].map((p, i) => (
+                  <button
+                    key={i}
+                    title={p.label}
+                    onClick={() => { setQuery(p.q); handleSearch(p.q); }}
+                    className="w-11 h-11 mb-3 rounded-full bg-white/85 border border-white/60 shadow-md flex items-center justify-center text-2xl transition hover:scale-110 hover:shadow-lg hover:bg-white"
+                  >
+                    {p.emoji}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 2xl: full pill with label (fits ~190px gutter) */}
+            <div
+              className={`hidden 2xl:block fixed ${side === "left" ? "left-3" : "right-3"} top-20 z-10`}
+              style={{ width: 152, height: "calc(100vh - 96px)", overflow: "hidden" }}
+            >
+              <div className={dir} style={{ willChange: "transform" }}>
+                {[...pills, ...pills].map((p, i) => (
+                  <button
+                    key={i}
+                    onClick={() => { setQuery(p.q); handleSearch(p.q); }}
+                    className="flex items-center gap-2 w-full mb-3 rounded-2xl border border-white/70 bg-white/80 px-3 py-2.5 text-sm font-medium text-gray-700 shadow-md backdrop-blur-sm transition hover:bg-white hover:scale-105 hover:shadow-lg"
+                  >
+                    <span className="text-xl">{p.emoji}</span>
+                    <span>{p.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </>
         );
 
         return (
           <>
-            {/* LEFT — scrolls upward */}
-            <div className="hidden 2xl:block fixed left-3 top-20 w-40 z-10"
-                 style={{ height: "calc(100vh - 96px)", overflow: "hidden" }}>
-              <div className="scroll-up" style={{ willChange: "transform" }}>
-                {[...leftPills, ...leftPills].map((p, i) => (
-                  <PillButton key={i} {...p} />
-                ))}
-              </div>
-            </div>
-
-            {/* RIGHT — scrolls downward (opposite direction for variety) */}
-            <div className="hidden 2xl:block fixed right-3 top-20 w-44 z-10"
-                 style={{ height: "calc(100vh - 96px)", overflow: "hidden" }}>
-              <div className="scroll-down" style={{ willChange: "transform" }}>
-                {[...rightPills, ...rightPills].map((p, i) => (
-                  <PillButton key={i} {...p} />
-                ))}
-              </div>
-            </div>
+            <Strip pills={leftPills}  dir="scroll-up"   side="left"  />
+            <Strip pills={rightPills} dir="scroll-down" side="right" />
           </>
         );
       })()}
