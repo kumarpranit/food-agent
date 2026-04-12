@@ -1,7 +1,34 @@
 import math
+import time
 import requests
 from urllib.parse import quote_plus
 from ..config import GOOGLE_MAPS_API_KEY, PLACES_NEARBY_URL
+
+# Simple in-memory cache: key → (timestamp, results)
+# Entries expire after CACHE_TTL seconds
+_cache: dict = {}
+CACHE_TTL = 300  # 5 minutes
+
+
+def _cache_key(lat, lng, radius, keyword, min_price, max_price, place_type) -> str:
+    # Round lat/lng to 3 decimals (~110m precision) so nearby searches share cache
+    return f"{round(lat,3)},{round(lng,3)}|{radius}|{keyword}|{min_price}|{max_price}|{place_type}"
+
+
+def _cache_get(key: str):
+    entry = _cache.get(key)
+    if entry and (time.time() - entry[0]) < CACHE_TTL:
+        return entry[1]
+    return None
+
+
+def _cache_set(key: str, value) -> None:
+    _cache[key] = (time.time(), value)
+    # Evict old entries to prevent unbounded growth (keep last 200)
+    if len(_cache) > 200:
+        oldest = sorted(_cache.items(), key=lambda x: x[1][0])[:50]
+        for k, _ in oldest:
+            del _cache[k]
 
 # Types that should never appear in restaurant results
 EXCLUDED_TYPES = {
@@ -68,6 +95,13 @@ def search_nearby_restaurants(
     if max_price is not None:
         params["maxprice"] = max_price
 
+    # Check cache first
+    ck = _cache_key(lat, lng, radius, keyword, min_price, max_price, place_type)
+    cached = _cache_get(ck)
+    if cached is not None:
+        print("CACHE HIT — skipping Google API call")
+        return cached
+
     print("KEY PRESENT:", bool(GOOGLE_MAPS_API_KEY))
     print("PLACES URL:", PLACES_NEARBY_URL)
     print("PARAMS:", {k: v for k, v in params.items() if k != "key"})
@@ -119,4 +153,5 @@ def search_nearby_restaurants(
         )
     )
 
+    _cache_set(ck, cleaned)
     return cleaned

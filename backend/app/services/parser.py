@@ -31,9 +31,16 @@ def parse_user_query(query: str) -> Dict[str, Any]:
     elif re.search(r"\bfancy\b|\bexpensive\b|\bupscale\b|\bfine dining\b|\bluxury\b|\bpremium\b", text):
         parsed["min_price"] = 3
 
-    # Place type detection — override to "cafe" for coffee/cafe searches
+    # Place type detection
     if re.search(r"\bcafe\b|\bcafes\b|\bcoffee\b|\bstarbucks\b|\blatte\b|\bespresso\b|\bcappuccino\b|\bworking cafe\b|\bcoffee shop\b|\bcoffee shops\b", text):
         parsed["place_type"] = "cafe"
+    elif re.search(r"\bpub\b|\bpubs\b|\bbar\b|\bbars\b|\btavern\b|\btaverns\b|\bnightlife\b|\bdrinks\b|\bcocktail\b|\bcocktails\b|\bbeer\b|\bdraft\b|\bale\b|\bbrewery\b|\bbreweries\b", text):
+        parsed["place_type"] = "bar"
+    elif re.search(r"\bbrunch\b", text):
+        parsed["place_type"] = "restaurant"
+        # Broaden keyword so Google finds brunch spots faster
+        if parsed["keyword"].strip() in ("brunch",):
+            parsed["keyword"] = "brunch breakfast"
 
     noise_words = [
         "near me",
@@ -43,6 +50,15 @@ def parse_user_query(query: str) -> Dict[str, Any]:
         "restaurants",
         "food",
         "within",
+        # bar/pub words (already parsed)
+        "pub",
+        "pubs",
+        "tavern",
+        "taverns",
+        "nightlife",
+        "drinks",
+        "cocktails",
+        "cocktail",
         # price-related words (already parsed above)
         "cheap",
         "budget",
