@@ -303,9 +303,54 @@ export default function ChatPage() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-amber-100 relative overflow-hidden">
+      {/* Background blobs */}
       <div className="absolute -top-20 -left-20 h-72 w-72 rounded-full bg-orange-200/30 blur-3xl" />
       <div className="absolute top-40 right-0 h-80 w-80 rounded-full bg-pink-200/20 blur-3xl" />
       <div className="absolute bottom-0 left-1/3 h-72 w-72 rounded-full bg-yellow-200/30 blur-3xl" />
+
+      {/* LEFT gutter — floating cuisine pills, only on large screens */}
+      <div className="hidden xl:flex flex-col gap-5 absolute left-4 top-24 w-36 pointer-events-none select-none">
+        {[
+          { emoji: "🍕", label: "Italian",     cls: "float",      delay: "0s",    q: "italian" },
+          { emoji: "🌮", label: "Mexican",     cls: "float-slow", delay: "0.6s",  q: "mexican" },
+          { emoji: "🍔", label: "Burgers",     cls: "float-fast", delay: "1.1s",  q: "burgers" },
+          { emoji: "🥗", label: "Healthy",     cls: "float",      delay: "1.8s",  q: "healthy food" },
+          { emoji: "🍜", label: "Noodles",     cls: "float-slow", delay: "0.3s",  q: "noodles ramen" },
+          { emoji: "🥞", label: "Breakfast",   cls: "float-fast", delay: "2.1s",  q: "breakfast" },
+        ].map(({ emoji, label, cls, delay, q }) => (
+          <button
+            key={label}
+            onClick={() => { setQuery(q); handleSearch(q); }}
+            style={{ animationDelay: delay }}
+            className={`${cls} pointer-events-auto flex items-center gap-2 rounded-2xl border border-white/70 bg-white/75 px-3 py-2.5 text-sm font-medium text-gray-700 shadow-md backdrop-blur-sm transition hover:bg-white hover:scale-105 hover:shadow-lg`}
+          >
+            <span className="text-xl">{emoji}</span>
+            <span>{label}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* RIGHT gutter — floating cuisine pills */}
+      <div className="hidden xl:flex flex-col gap-5 absolute right-4 top-24 w-40 pointer-events-none select-none">
+        {[
+          { emoji: "🍣", label: "Sushi",        cls: "float-slow", delay: "0.4s",  q: "sushi" },
+          { emoji: "🍛", label: "Indian",        cls: "float",      delay: "1.0s",  q: "indian food" },
+          { emoji: "☕", label: "Coffee",        cls: "float-fast", delay: "0.2s",  q: "coffee shops" },
+          { emoji: "🥩", label: "Steakhouse",   cls: "float",      delay: "1.5s",  q: "steakhouse" },
+          { emoji: "🌯", label: "Mediterranean", cls: "float-slow", delay: "0.8s",  q: "mediterranean" },
+          { emoji: "🍦", label: "Desserts",      cls: "float-fast", delay: "2.3s",  q: "desserts" },
+        ].map(({ emoji, label, cls, delay, q }) => (
+          <button
+            key={label}
+            onClick={() => { setQuery(q); handleSearch(q); }}
+            style={{ animationDelay: delay }}
+            className={`${cls} pointer-events-auto flex items-center gap-2 rounded-2xl border border-white/70 bg-white/75 px-3 py-2.5 text-sm font-medium text-gray-700 shadow-md backdrop-blur-sm transition hover:bg-white hover:scale-105 hover:shadow-lg`}
+          >
+            <span className="text-xl">{emoji}</span>
+            <span>{label}</span>
+          </button>
+        ))}
+      </div>
 
       <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
         <div className="flex items-start justify-between gap-4 mb-6 sm:mb-8">
