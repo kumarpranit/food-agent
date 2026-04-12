@@ -3,19 +3,14 @@
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 
-type AuthMode = "options" | "email" | "phone" | "phone-otp";
+type AuthMode = "options" | "email";
 
 export default function LoginPage() {
   const [mode, setMode] = useState<AuthMode>("options");
   const [isSignUp, setIsSignUp] = useState(false);
 
-  // Email/password fields
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
-  // Phone fields
-  const [phone, setPhone] = useState("");
-  const [otp, setOtp] = useState("");
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -52,34 +47,6 @@ export default function LoginPage() {
       if (error) setError(error.message);
       else window.location.href = "/chat";
     }
-    setLoading(false);
-  };
-
-  // ── Phone OTP ────────────────────────────────────────────────
-  const handlePhoneSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    clearState();
-    setLoading(true);
-    const { error } = await supabase.auth.signInWithOtp({ phone });
-    if (error) setError(error.message);
-    else {
-      setMessage("OTP sent! Check your messages.");
-      setMode("phone-otp");
-    }
-    setLoading(false);
-  };
-
-  const handleOtpVerify = async (e: React.FormEvent) => {
-    e.preventDefault();
-    clearState();
-    setLoading(true);
-    const { error } = await supabase.auth.verifyOtp({
-      phone,
-      token: otp,
-      type: "sms",
-    });
-    if (error) setError(error.message);
-    else window.location.href = "/chat";
     setLoading(false);
   };
 
@@ -121,15 +88,6 @@ export default function LoginPage() {
                 Continue with Google
               </button>
 
-              {/* Phone */}
-              <button
-                onClick={() => { clearState(); setMode("phone"); }}
-                className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl border border-[var(--foreground)]/10 bg-[var(--background)] hover:bg-[var(--foreground)]/5 transition-all duration-150 text-sm font-medium text-[var(--foreground)]"
-              >
-                <PhoneIcon />
-                Continue with Phone
-              </button>
-
               {/* Divider */}
               <div className="flex items-center gap-3 py-1">
                 <div className="flex-1 h-px bg-[var(--foreground)]/10" />
@@ -167,7 +125,7 @@ export default function LoginPage() {
                   onClick={() => { clearState(); setMode("options"); }}
                   className="text-[var(--foreground)] opacity-40 hover:opacity-70 transition-opacity"
                 >
-                  ← 
+                  ←
                 </button>
                 <h2 className="text-base font-semibold text-[var(--foreground)]">
                   {isSignUp ? "Create account" : "Welcome back"}
@@ -227,105 +185,6 @@ export default function LoginPage() {
               </p>
             </form>
           )}
-
-          {/* ── Mode: Phone ── */}
-          {mode === "phone" && (
-            <form onSubmit={handlePhoneSubmit} className="space-y-4">
-              <div className="flex items-center gap-2 mb-6">
-                <button
-                  type="button"
-                  onClick={() => { clearState(); setMode("options"); }}
-                  className="text-[var(--foreground)] opacity-40 hover:opacity-70 transition-opacity"
-                >
-                  ←
-                </button>
-                <h2 className="text-base font-semibold text-[var(--foreground)]">
-                  Enter your number
-                </h2>
-              </div>
-
-              <div>
-                <label className="text-xs font-medium text-[var(--foreground)] opacity-50 block mb-1.5">
-                  Phone number (with country code)
-                </label>
-                <input
-                  type="tel"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="+1 555 000 0000"
-                  required
-                  className="w-full px-4 py-3 rounded-xl border border-[var(--foreground)]/10 bg-[var(--background)] text-[var(--foreground)] text-sm placeholder:text-[var(--foreground)]/25 focus:outline-none focus:border-orange-500/60 focus:ring-1 focus:ring-orange-500/30 transition-all"
-                />
-              </div>
-
-              {error && <ErrorBox message={error} />}
-              {message && <SuccessBox message={message} />}
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-3 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium transition-all duration-150 disabled:opacity-40"
-              >
-                {loading ? "Sending…" : "Send OTP"}
-              </button>
-            </form>
-          )}
-
-          {/* ── Mode: Phone OTP verify ── */}
-          {mode === "phone-otp" && (
-            <form onSubmit={handleOtpVerify} className="space-y-4">
-              <div className="flex items-center gap-2 mb-6">
-                <button
-                  type="button"
-                  onClick={() => { clearState(); setMode("phone"); }}
-                  className="text-[var(--foreground)] opacity-40 hover:opacity-70 transition-opacity"
-                >
-                  ←
-                </button>
-                <h2 className="text-base font-semibold text-[var(--foreground)]">
-                  Enter the code
-                </h2>
-              </div>
-
-              <p className="text-xs text-[var(--foreground)] opacity-40 -mt-3 mb-2">
-                Sent to {phone}
-              </p>
-
-              <div>
-                <label className="text-xs font-medium text-[var(--foreground)] opacity-50 block mb-1.5">
-                  6-digit OTP
-                </label>
-                <input
-                  type="text"
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value)}
-                  placeholder="123456"
-                  maxLength={6}
-                  required
-                  className="w-full px-4 py-3 rounded-xl border border-[var(--foreground)]/10 bg-[var(--background)] text-[var(--foreground)] text-sm tracking-[0.4em] font-mono placeholder:text-[var(--foreground)]/25 placeholder:tracking-normal focus:outline-none focus:border-orange-500/60 focus:ring-1 focus:ring-orange-500/30 transition-all"
-                />
-              </div>
-
-              {error && <ErrorBox message={error} />}
-              {message && <SuccessBox message={message} />}
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-3 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium transition-all duration-150 disabled:opacity-40"
-              >
-                {loading ? "Verifying…" : "Verify & Sign in"}
-              </button>
-
-              <button
-                type="button"
-                onClick={() => { clearState(); setMode("phone"); }}
-                className="w-full text-xs text-[var(--foreground)] opacity-30 hover:opacity-60 transition-opacity pt-1"
-              >
-                Resend code
-              </button>
-            </form>
-          )}
         </div>
 
         <p className="text-center text-xs text-[var(--foreground)] opacity-20 mt-6">
@@ -361,14 +220,6 @@ function GoogleIcon() {
       <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853"/>
       <path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
       <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
-    </svg>
-  );
-}
-
-function PhoneIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.42 2 2 0 0 1 3.6 1.25h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.82a16 16 0 0 0 6.29 6.29l.94-.94a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
     </svg>
   );
 }
