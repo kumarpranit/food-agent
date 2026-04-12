@@ -115,7 +115,7 @@ export default function ChatPage() {
   const [lng, setLng] = useState<number | null>(-118.2437);
   const [locationReady, setLocationReady] = useState(false);
   const [locationDenied, setLocationDenied] = useState(false);
-  const [radius, setRadius] = useState(3218);
+  const [radius] = useState(8047); // fixed 5 miles — not exposed in UI
   const [openOnly, setOpenOnly] = useState(false);
   const [loading, setLoading] = useState(false);
   const [viewportWidth, setViewportWidth] = useState(0);
@@ -446,16 +446,6 @@ export default function ChatPage() {
 
         <section className="rounded-2xl sm:rounded-3xl border border-white/60 bg-white/65 p-4 sm:p-5 shadow-xl shadow-orange-100/50 backdrop-blur-xl">
           <div className="flex flex-wrap gap-2 sm:gap-3 mb-4">
-            <select
-              className="rounded-xl border border-gray-200 bg-white px-3 py-2 sm:px-4 sm:py-3 text-sm shadow-sm outline-none transition focus:ring-2 focus:ring-orange-300"
-              value={radius}
-              onChange={(e) => setRadius(Number(e.target.value))}
-            >
-              <option value={1609}>1 mile</option>
-              <option value={3218}>2 miles</option>
-              <option value={8047}>5 miles</option>
-            </select>
-
             <label className="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-2 sm:px-4 sm:py-3 text-sm shadow-sm cursor-pointer">
               <input
                 type="checkbox"
