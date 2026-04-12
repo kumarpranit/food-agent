@@ -308,8 +308,8 @@ export default function ChatPage() {
       <div className="absolute top-40 right-0 h-80 w-80 rounded-full bg-pink-200/20 blur-3xl" />
       <div className="absolute bottom-0 left-1/3 h-72 w-72 rounded-full bg-yellow-200/30 blur-3xl" />
 
-      {/* LEFT gutter — floating cuisine pills, only on large screens */}
-      <div className="hidden xl:flex flex-col gap-5 absolute left-4 top-24 w-36 pointer-events-none select-none">
+      {/* LEFT gutter — fixed so overflow-hidden on main doesn't clip them */}
+      <div className="hidden 2xl:flex flex-col gap-5 fixed left-4 top-24 w-40 pointer-events-none select-none z-10">
         {[
           { emoji: "🍕", label: "Italian",     cls: "float",      delay: "0s",    q: "italian" },
           { emoji: "🌮", label: "Mexican",     cls: "float-slow", delay: "0.6s",  q: "mexican" },
@@ -331,7 +331,7 @@ export default function ChatPage() {
       </div>
 
       {/* RIGHT gutter — floating cuisine pills */}
-      <div className="hidden xl:flex flex-col gap-5 absolute right-4 top-24 w-40 pointer-events-none select-none">
+      <div className="hidden 2xl:flex flex-col gap-5 fixed right-4 top-24 w-40 pointer-events-none select-none z-10">
         {[
           { emoji: "🍣", label: "Sushi",        cls: "float-slow", delay: "0.4s",  q: "sushi" },
           { emoji: "🍛", label: "Indian",        cls: "float",      delay: "1.0s",  q: "indian food" },
