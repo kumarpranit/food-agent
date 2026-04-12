@@ -742,7 +742,7 @@ export default function ChatPage() {
       </div>
 
       {/* Food Bot chat widget */}
-      <ChatBot lat={lat} lng={lng} />
+      <ChatBot lat={lat} lng={lng} onSearch={saveToHistory} />
     </main>
   );
 }

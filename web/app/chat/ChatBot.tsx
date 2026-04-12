@@ -43,7 +43,7 @@ const QUICK_PROMPTS = [
   "🥗 Healthy lunch",
 ];
 
-export default function ChatBot({ lat, lng }: { lat: number | null; lng: number | null }) {
+export default function ChatBot({ lat, lng, onSearch }: { lat: number | null; lng: number | null; onSearch?: (q: string) => void }) {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([
@@ -106,7 +106,10 @@ export default function ChatBot({ lat, lng }: { lat: number | null; lng: number 
 
       const data = await res.json();
 
-      if (data.keyword_used) setLastKeyword(data.keyword_used);
+      if (data.keyword_used) {
+        setLastKeyword(data.keyword_used);
+        onSearch?.(data.keyword_used);
+      }
 
       const botMsg: Message = {
         id: (Date.now() + 1).toString(),
