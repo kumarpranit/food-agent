@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 import os
 
 from .schemas import NearbySearchRequest, NearbySearchResponse
@@ -7,6 +8,7 @@ from .services.google_places import search_nearby_restaurants
 from .services.parser import parse_user_query
 from .services.recommendation import rank_restaurants
 from .services.place_details import get_place_details
+from .services.bot import bot_reply
 
 app = FastAPI(title="Food Agent API")
 BACKEND_API_KEY = os.getenv("BACKEND_API_KEY")
@@ -33,6 +35,24 @@ app.add_middleware(
 @app.get("/health")
 def health():
     return {"status": "ok"}
+
+
+class BotChatRequest(BaseModel):
+    message: str
+    lat: float
+    lng: float
+    last_keyword: str | None = None
+
+
+@app.post("/bot/chat")
+def bot_chat(payload: BotChatRequest, x_api_key: str = Header(default="")):
+    verify_api_key(x_api_key)
+    return bot_reply(
+        message=payload.message,
+        lat=payload.lat,
+        lng=payload.lng,
+        last_keyword=payload.last_keyword,
+    )
 
 
 @app.get("/restaurant/{place_id}/details")

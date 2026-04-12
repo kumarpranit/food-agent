@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import type { User } from "@supabase/supabase-js";
+import ChatBot from "./ChatBot";
 
 type Restaurant = {
   name: string;
@@ -754,6 +755,9 @@ export default function ChatPage() {
           )}
         </section>
       </div>
+
+      {/* Food Bot chat widget */}
+      <ChatBot lat={lat} lng={lng} />
     </main>
   );
 }
