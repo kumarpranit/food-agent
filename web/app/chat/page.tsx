@@ -351,7 +351,7 @@ export default function ChatPage() {
               position: "fixed",
               [side]: wide ? 12 : 8,
               top: 80,
-              width: wide ? 152 : 48,
+              width: wide ? 152 : 72,
               height: "calc(100vh - 96px)",
               overflow: "hidden",
               zIndex: 10,
@@ -371,11 +371,11 @@ export default function ChatPage() {
                 ) : (
                   <button
                     key={i}
-                    title={p.label}
                     onClick={() => { setQuery(p.q); handleSearch(p.q); }}
-                    className="w-11 h-11 mb-3 rounded-full bg-white/85 border border-white/60 shadow-md flex items-center justify-center text-2xl transition hover:scale-110 hover:shadow-lg hover:bg-white"
+                    className="w-full mb-3 rounded-2xl bg-white/85 border border-white/60 shadow-md flex flex-col items-center justify-center py-2 gap-0.5 transition hover:scale-105 hover:shadow-lg hover:bg-white"
                   >
-                    {p.emoji}
+                    <span className="text-xl leading-none">{p.emoji}</span>
+                    <span className="text-[9px] font-medium text-gray-600 leading-tight text-center px-0.5">{p.label}</span>
                   </button>
                 )
               )}
