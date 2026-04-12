@@ -87,6 +87,7 @@ export default function ChatBot({ lat, lng }: { lat: number | null; lng: number 
     setMessages((prev) => [...prev, userMsg]);
     setInput("");
     setLoading(true);
+    setTimeout(() => inputRef.current?.focus(), 0);
 
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/bot/chat`, {
@@ -118,6 +119,7 @@ export default function ChatBot({ lat, lng }: { lat: number | null; lng: number 
 
       setMessages((prev) => [...prev, botMsg]);
       if (!open) setUnread((n) => n + 1);
+      setTimeout(() => inputRef.current?.focus(), 50);
     } catch {
       setMessages((prev) => [
         ...prev,
