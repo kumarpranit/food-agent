@@ -22,27 +22,48 @@ def parse_user_query(query: str) -> Dict[str, Any]:
     if "open now" in text or "open" in text:
         parsed["open_now"] = True
 
-    # Price level detection from natural language
-    if re.search(r"\bcheap\b|\bbudget\b|\binexpensive\b|\baffordable\b", text):
+    # ── Step 1: Detect explicit price constraints first (highest priority) ──
+    explicit_price = False
+
+    # "under $X" / "below $X" / "less than $X"
+    dollar_match = re.search(r"(?:under|below|less than|max|around|about)\s*\$?(\d+)", text)
+    if dollar_match:
+        amount = int(dollar_match.group(1))
+        explicit_price = True
+        if amount <= 15:
+            parsed["max_price"] = 0
+        elif amount <= 30:
+            parsed["max_price"] = 1
+        elif amount <= 60:
+            parsed["max_price"] = 2
+        elif amount <= 120:
+            parsed["max_price"] = 3
+        else:
+            parsed["max_price"] = 4
+    elif re.search(r"\bcheap\b|\bbudget\b|\binexpensive\b|\baffordable\b", text):
         parsed["max_price"] = 1
+        explicit_price = True
     elif re.search(r"\bmoderate\b|\bmid.range\b|\breasonable\b", text):
         parsed["min_price"] = 1
         parsed["max_price"] = 2
-    elif re.search(r"\bfancy\b|\bexpensive\b|\bupscale\b|\bfine dining\b|\bluxury\b|\bpremium\b|\bdate night\b|\bromantic\b|\banniversary\b|\bspecial occasion\b|\bproposal\b", text):
-        parsed["min_price"] = 3
+        explicit_price = True
 
-    # Place type detection
+    # ── Step 2: Intent-based price (only if no explicit price given) ──
+    if not explicit_price:
+        if re.search(r"\bfancy\b|\bexpensive\b|\bupscale\b|\bfine dining\b|\bluxury\b|\bpremium\b|\bdate night\b|\bromantic\b|\banniversary\b|\bspecial occasion\b|\bproposal\b", text):
+            parsed["min_price"] = 3
+
+    # ── Step 3: Place type detection ──
     if re.search(r"\bcafe\b|\bcafes\b|\bcoffee\b|\bstarbucks\b|\blatte\b|\bespresso\b|\bcappuccino\b|\bworking cafe\b|\bcoffee shop\b|\bcoffee shops\b", text):
         parsed["place_type"] = "cafe"
     elif re.search(r"\bpub\b|\bpubs\b|\bbar\b|\bbars\b|\btavern\b|\btaverns\b|\bnightlife\b|\bdrinks\b|\bcocktail\b|\bcocktails\b|\bbeer\b|\bdraft\b|\bale\b|\bbrewery\b|\bbreweries\b", text):
         parsed["place_type"] = "bar"
     elif re.search(r"\bbrunch\b", text):
         parsed["place_type"] = "restaurant"
-        # Broaden keyword so Google finds brunch spots faster
         if parsed["keyword"].strip() in ("brunch",):
             parsed["keyword"] = "brunch breakfast"
 
-    # Special intent keyword mapping — replace vague phrases with searchable terms
+    # ── Step 4: Intent keyword mapping (gives Google a better search term) ──
     INTENT_MAP = {
         r"\bdate night\b": "romantic dinner",
         r"\bromantic\b": "romantic dinner",
