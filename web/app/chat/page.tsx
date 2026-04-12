@@ -571,9 +571,6 @@ export default function ChatPage() {
                   <h2 className="text-2xl font-semibold text-gray-900">
                     ⭐ Best Pick For You
                   </h2>
-                  <span className="text-sm text-gray-500">
-                    {filteredResults.length} match{filteredResults.length !== 1 ? "es" : ""}
-                  </span>
                 </div>
 
                 <div className="rounded-2xl sm:rounded-3xl border-2 border-orange-300 bg-white p-4 sm:p-6 shadow-xl">
