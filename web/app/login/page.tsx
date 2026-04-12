@@ -5,23 +5,29 @@ import { supabase } from "@/lib/supabase";
 
 type AuthMode = "options" | "email";
 
+const FOOD_FACTS = [
+  "🍕 Naples, Italy invented pizza in the 18th century",
+  "🍣 Sushi originally meant 'sour-tasting' in Japanese",
+  "🌮 Tacos date back to Mexican silver mines in the 1700s",
+  "🍜 Ramen was introduced to Japan from China in the 1800s",
+  "🥐 The croissant was actually invented in Austria, not France",
+  "🍔 The hamburger gets its name from Hamburg, Germany",
+  "☕ Coffee was discovered by Ethiopian goat herders",
+  "🍦 Ice cream was a luxury only royalty could afford in the 1600s",
+];
+
 export default function LoginPage() {
   const [mode, setMode] = useState<AuthMode>("options");
   const [isSignUp, setIsSignUp] = useState(false);
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const [factIdx] = useState(() => Math.floor(Math.random() * FOOD_FACTS.length));
 
-  const clearState = () => {
-    setError(null);
-    setMessage(null);
-  };
+  const clearState = () => { setError(null); setMessage(null); };
 
-  // ── Gmail OAuth ──────────────────────────────────────────────
   const handleGoogleLogin = async () => {
     clearState();
     setLoading(true);
@@ -33,7 +39,6 @@ export default function LoginPage() {
     setLoading(false);
   };
 
-  // ── Email + Password ─────────────────────────────────────────
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     clearState();
@@ -51,164 +56,202 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[var(--background)] px-4">
-      {/* Card */}
-      <div className="w-full max-w-md">
+    <div className="min-h-screen flex">
 
-        {/* Logo / Brand */}
-        <div className="text-center mb-10">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-orange-500 mb-4 text-2xl">
+      {/* ── Left panel: Hero ── */}
+      <div
+        className="hidden lg:flex lg:w-1/2 xl:w-3/5 relative flex-col justify-between p-12"
+        style={{
+          backgroundImage:
+            'url("https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1400&q=80")',
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      >
+        {/* Dark gradient overlay */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(160deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.30) 50%, rgba(234,88,12,0.60) 100%)",
+          }}
+        />
+
+        {/* Top: Logo */}
+        <div className="relative z-10 flex items-center gap-3">
+          <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-orange-500 text-lg shadow-lg">
             🍽️
           </div>
-          <h1 className="text-2xl font-semibold text-[var(--foreground)] tracking-tight">
-            Food Agent
+          <span className="text-white text-lg font-semibold tracking-tight">Food Agent</span>
+        </div>
+
+        {/* Middle: Big headline */}
+        <div className="relative z-10">
+          <h1 className="text-5xl xl:text-6xl font-bold text-white leading-tight">
+            Find your next<br />
+            <span className="text-orange-400">favourite meal</span>
           </h1>
-          <p className="text-sm text-[var(--foreground)] opacity-50 mt-1">
-            Discover restaurants with AI
+          <p className="mt-4 text-white/70 text-lg max-w-md">
+            AI-powered restaurant discovery. Get personalised picks based on your location, mood, and budget — instantly.
           </p>
         </div>
 
-        {/* Panel */}
-        <div className="rounded-2xl border border-[var(--foreground)]/10 bg-[var(--foreground)]/[0.03] p-8 backdrop-blur-sm">
+        {/* Bottom: Food fact card */}
+        <div className="relative z-10">
+          <div
+            className="rounded-2xl px-5 py-4 max-w-sm"
+            style={{ background: "rgba(255,255,255,0.12)", backdropFilter: "blur(12px)", border: "1px solid rgba(255,255,255,0.20)" }}
+          >
+            <p className="text-white/50 text-xs font-medium uppercase tracking-widest mb-1">Did you know?</p>
+            <p className="text-white text-sm leading-relaxed">{FOOD_FACTS[factIdx]}</p>
+          </div>
+        </div>
+      </div>
 
-          {/* ── Mode: Options ── */}
+      {/* ── Right panel: Login form ── */}
+      <div
+        className="w-full lg:w-1/2 xl:w-2/5 flex flex-col items-center justify-center px-6 py-12 relative"
+        style={{ background: "linear-gradient(160deg, #fff9f5 0%, #ffffff 60%, #fff3e0 100%)" }}
+      >
+        {/* Subtle decorative blobs */}
+        <div className="absolute top-0 right-0 w-64 h-64 rounded-full bg-orange-100/60 blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-48 h-48 rounded-full bg-amber-100/60 blur-3xl translate-y-1/3 -translate-x-1/3 pointer-events-none" />
+
+        {/* Mobile-only logo */}
+        <div className="lg:hidden text-center mb-8 relative z-10">
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-orange-500 mb-3 text-2xl shadow-lg">
+            🍽️
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900">Food Agent</h1>
+          <p className="text-sm text-gray-500 mt-1">Discover restaurants with AI</p>
+        </div>
+
+        <div className="w-full max-w-sm relative z-10">
+
+          {/* Heading */}
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-gray-900">
+              {mode === "email" ? (isSignUp ? "Create account" : "Welcome back") : "Sign in"}
+            </h2>
+            <p className="text-sm text-gray-500 mt-1">
+              {mode === "email"
+                ? isSignUp ? "Start discovering great food near you." : "Good to see you again 👋"
+                : "Choose how you'd like to continue."}
+            </p>
+          </div>
+
+          {/* ── Options mode ── */}
           {mode === "options" && (
             <div className="space-y-3">
-              <p className="text-xs font-medium text-[var(--foreground)] opacity-40 uppercase tracking-widest mb-5 text-center">
-                Sign in to continue
-              </p>
-
-              {/* Google */}
               <button
                 onClick={handleGoogleLogin}
                 disabled={loading}
-                className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl border border-[var(--foreground)]/10 bg-[var(--background)] hover:bg-[var(--foreground)]/5 transition-all duration-150 text-sm font-medium text-[var(--foreground)] disabled:opacity-40"
+                className="w-full flex items-center justify-center gap-3 px-4 py-3.5 rounded-2xl border border-gray-200 bg-white hover:bg-gray-50 transition-all text-sm font-medium text-gray-700 shadow-sm disabled:opacity-40"
               >
                 <GoogleIcon />
                 Continue with Google
               </button>
 
-              {/* Divider */}
-              <div className="flex items-center gap-3 py-1">
-                <div className="flex-1 h-px bg-[var(--foreground)]/10" />
-                <span className="text-xs text-[var(--foreground)] opacity-30">or</span>
-                <div className="flex-1 h-px bg-[var(--foreground)]/10" />
+              <div className="flex items-center gap-3">
+                <div className="flex-1 h-px bg-gray-200" />
+                <span className="text-xs text-gray-400">or</span>
+                <div className="flex-1 h-px bg-gray-200" />
               </div>
 
-              {/* Email */}
               <button
                 onClick={() => { clearState(); setMode("email"); setIsSignUp(false); }}
-                className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl bg-orange-500 hover:bg-orange-600 transition-all duration-150 text-sm font-medium text-white"
+                className="w-full flex items-center justify-center gap-3 px-4 py-3.5 rounded-2xl bg-orange-500 hover:bg-orange-600 transition-all text-sm font-semibold text-white shadow-md shadow-orange-200"
               >
                 <EmailIcon />
                 Continue with Email
               </button>
 
-              <p className="text-center text-xs text-[var(--foreground)] opacity-30 pt-2">
-                No account yet?{" "}
+              <p className="text-center text-sm text-gray-500 pt-1">
+                No account?{" "}
                 <button
                   onClick={() => { clearState(); setMode("email"); setIsSignUp(true); }}
-                  className="text-orange-500 hover:text-orange-400 font-medium opacity-100"
+                  className="text-orange-500 hover:text-orange-600 font-semibold"
                 >
-                  Sign up
+                  Sign up free
                 </button>
               </p>
             </div>
           )}
 
-          {/* ── Mode: Email ── */}
+          {/* ── Email mode ── */}
           {mode === "email" && (
             <form onSubmit={handleEmailSubmit} className="space-y-4">
-              <div className="flex items-center gap-2 mb-6">
-                <button
-                  type="button"
-                  onClick={() => { clearState(); setMode("options"); }}
-                  className="text-[var(--foreground)] opacity-40 hover:opacity-70 transition-opacity"
-                >
-                  ←
-                </button>
-                <h2 className="text-base font-semibold text-[var(--foreground)]">
-                  {isSignUp ? "Create account" : "Welcome back"}
-                </h2>
+              <div>
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide block mb-1.5">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@gmail.com"
+                  required
+                  className="w-full px-4 py-3 rounded-2xl border border-gray-200 bg-white text-gray-900 text-sm placeholder:text-gray-400 focus:outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 transition-all shadow-sm"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide block mb-1.5">
+                  Password
+                </label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  required
+                  minLength={6}
+                  className="w-full px-4 py-3 rounded-2xl border border-gray-200 bg-white text-gray-900 text-sm placeholder:text-gray-400 focus:outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 transition-all shadow-sm"
+                />
               </div>
 
-              <div className="space-y-3">
-                <div>
-                  <label className="text-xs font-medium text-[var(--foreground)] opacity-50 block mb-1.5">
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="you@gmail.com"
-                    required
-                    className="w-full px-4 py-3 rounded-xl border border-[var(--foreground)]/10 bg-[var(--background)] text-[var(--foreground)] text-sm placeholder:text-[var(--foreground)]/25 focus:outline-none focus:border-orange-500/60 focus:ring-1 focus:ring-orange-500/30 transition-all"
-                  />
+              {error && (
+                <div className="px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm">
+                  {error}
                 </div>
-                <div>
-                  <label className="text-xs font-medium text-[var(--foreground)] opacity-50 block mb-1.5">
-                    Password
-                  </label>
-                  <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
-                    required
-                    minLength={6}
-                    className="w-full px-4 py-3 rounded-xl border border-[var(--foreground)]/10 bg-[var(--background)] text-[var(--foreground)] text-sm placeholder:text-[var(--foreground)]/25 focus:outline-none focus:border-orange-500/60 focus:ring-1 focus:ring-orange-500/30 transition-all"
-                  />
+              )}
+              {message && (
+                <div className="px-4 py-3 rounded-xl bg-green-50 border border-green-200 text-green-700 text-sm">
+                  {message}
                 </div>
-              </div>
-
-              {error && <ErrorBox message={error} />}
-              {message && <SuccessBox message={message} />}
+              )}
 
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium transition-all duration-150 disabled:opacity-40 mt-2"
+                className="w-full py-3.5 rounded-2xl bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold transition-all shadow-md shadow-orange-200 disabled:opacity-40"
               >
                 {loading ? "Please wait…" : isSignUp ? "Create account" : "Sign in"}
               </button>
 
-              <p className="text-center text-xs text-[var(--foreground)] opacity-30 pt-1">
-                {isSignUp ? "Already have an account? " : "No account? "}
+              <div className="flex items-center justify-between pt-1 text-sm">
+                <button
+                  type="button"
+                  onClick={() => { clearState(); setMode("options"); }}
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  ← Back
+                </button>
                 <button
                   type="button"
                   onClick={() => { clearState(); setIsSignUp(!isSignUp); }}
-                  className="text-orange-500 hover:text-orange-400 font-medium opacity-100"
+                  className="text-orange-500 hover:text-orange-600 font-semibold"
                 >
-                  {isSignUp ? "Sign in" : "Sign up"}
+                  {isSignUp ? "Sign in instead" : "Create account"}
                 </button>
-              </p>
+              </div>
             </form>
           )}
         </div>
 
-        <p className="text-center text-xs text-[var(--foreground)] opacity-20 mt-6">
+        <p className="relative z-10 text-center text-xs text-gray-400 mt-10">
           By continuing you agree to our Terms & Privacy Policy
         </p>
       </div>
-    </div>
-  );
-}
-
-// ── Small reusable components ────────────────────────────────────
-
-function ErrorBox({ message }: { message: string }) {
-  return (
-    <div className="px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-xs">
-      {message}
-    </div>
-  );
-}
-
-function SuccessBox({ message }: { message: string }) {
-  return (
-    <div className="px-4 py-3 rounded-xl bg-green-500/10 border border-green-500/20 text-green-600 dark:text-green-400 text-xs">
-      {message}
     </div>
   );
 }
