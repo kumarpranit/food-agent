@@ -118,9 +118,11 @@ export default function ChatPage() {
   const [locationReady, setLocationReady] = useState(false);
   const [locationDenied, setLocationDenied] = useState(false);
   const [radius] = useState(8047); // fixed 5 miles — not exposed in UI
-  const openOnly = filters.hours === "open_now" || filters.hours === "open_24h";
   const [loading, setLoading] = useState(false);
   const [viewportWidth, setViewportWidth] = useState(0);
+  const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
+  const openOnly = filters.hours === "open_now" || filters.hours === "open_24h";
+  const [searchHistory, setSearchHistory] = useState<string[]>([]);
 
   useEffect(() => {
     const update = () => setViewportWidth(window.innerWidth);
@@ -128,8 +130,6 @@ export default function ChatPage() {
     window.addEventListener("resize", update);
     return () => window.removeEventListener("resize", update);
   }, []);
-  const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
-  const [searchHistory, setSearchHistory] = useState<string[]>([]);
 
   const [rawResults, setRawResults] = useState<Restaurant[]>([]);
   const [topPick, setTopPick] = useState<Restaurant | null>(null);
