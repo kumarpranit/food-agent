@@ -107,7 +107,7 @@ function PortalDropdown({
         borderRadius: 16,
         boxShadow: "0 8px 30px rgba(0,0,0,0.14)",
         border: "1px solid #f3f4f6",
-        minWidth: wide ? 280 : 200,
+        width: wide ? 300 : 220,
         overflow: "hidden",
       }}
     >
