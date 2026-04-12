@@ -118,6 +118,14 @@ export default function ChatPage() {
   const [radius, setRadius] = useState(3218);
   const [openOnly, setOpenOnly] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [viewportWidth, setViewportWidth] = useState(0);
+
+  useEffect(() => {
+    const update = () => setViewportWidth(window.innerWidth);
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
   const [priceLevel, setPriceLevel] = useState<string>("");
   const [searchHistory, setSearchHistory] = useState<string[]>(() => {
     if (typeof window !== "undefined") {
@@ -308,61 +316,50 @@ export default function ChatPage() {
       <div className="absolute top-40 right-0 h-80 w-80 rounded-full bg-pink-200/20 blur-3xl" />
       <div className="absolute bottom-0 left-1/3 h-72 w-72 rounded-full bg-yellow-200/30 blur-3xl" />
 
-      {/* Escalator cuisine strips — emoji circles on xl (1280px+), full pills on 2xl (1536px+) */}
-      {(() => {
+      {/* Escalator cuisine strips — rendered via JS width check (bypasses Tailwind responsive issues) */}
+      {viewportWidth >= 1280 && (() => {
         const leftPills  = [
-          { emoji: "🍕", label: "Italian",        q: "italian"       },
-          { emoji: "🌮", label: "Mexican",        q: "mexican"       },
-          { emoji: "🍔", label: "Burgers",        q: "burgers"       },
-          { emoji: "🥗", label: "Healthy",        q: "healthy food"  },
-          { emoji: "🍜", label: "Noodles",        q: "noodles ramen" },
-          { emoji: "🥞", label: "Breakfast",      q: "breakfast"     },
-          { emoji: "🫕", label: "Soup",           q: "soup"          },
-          { emoji: "🥙", label: "Wraps",          q: "wraps"         },
+          { emoji: "🍕", label: "Italian",       q: "italian"       },
+          { emoji: "🌮", label: "Mexican",       q: "mexican"       },
+          { emoji: "🍔", label: "Burgers",       q: "burgers"       },
+          { emoji: "🥗", label: "Healthy",       q: "healthy food"  },
+          { emoji: "🍜", label: "Noodles",       q: "noodles ramen" },
+          { emoji: "🥞", label: "Breakfast",     q: "breakfast"     },
+          { emoji: "🫕", label: "Soup",          q: "soup"          },
+          { emoji: "🥙", label: "Wraps",         q: "wraps"         },
         ];
         const rightPills = [
-          { emoji: "🍣", label: "Sushi",          q: "sushi"         },
-          { emoji: "🍛", label: "Indian",          q: "indian food"   },
-          { emoji: "☕", label: "Coffee",          q: "coffee shops"  },
-          { emoji: "🥩", label: "Steakhouse",     q: "steakhouse"    },
-          { emoji: "🌯", label: "Mediterranean",  q: "mediterranean" },
-          { emoji: "🍦", label: "Desserts",        q: "desserts"      },
-          { emoji: "🍱", label: "Japanese",        q: "japanese food" },
-          { emoji: "🧆", label: "Mid. Eastern",   q: "middle eastern"},
+          { emoji: "🍣", label: "Sushi",         q: "sushi"         },
+          { emoji: "🍛", label: "Indian",        q: "indian food"   },
+          { emoji: "☕", label: "Coffee",        q: "coffee shops"  },
+          { emoji: "🥩", label: "Steakhouse",    q: "steakhouse"    },
+          { emoji: "🌯", label: "Mediterranean", q: "mediterranean" },
+          { emoji: "🍦", label: "Desserts",      q: "desserts"      },
+          { emoji: "🍱", label: "Japanese",      q: "japanese food" },
+          { emoji: "🧆", label: "Mid. Eastern",  q: "middle eastern"},
         ];
+
+        const wide = viewportWidth >= 1536;
 
         const Strip = ({ pills, dir, side }: {
           pills: typeof leftPills;
           dir: "scroll-up" | "scroll-down";
           side: "left" | "right";
         }) => (
-          <>
-            {/* xl: emoji circles only (fits ~70px gutter) */}
-            <div
-              className={`hidden xl:block 2xl:hidden fixed ${side === "left" ? "left-2" : "right-2"} top-20 z-10`}
-              style={{ width: 48, height: "calc(100vh - 96px)", overflow: "hidden" }}
-            >
-              <div className={dir} style={{ willChange: "transform" }}>
-                {[...pills, ...pills].map((p, i) => (
-                  <button
-                    key={i}
-                    title={p.label}
-                    onClick={() => { setQuery(p.q); handleSearch(p.q); }}
-                    className="w-11 h-11 mb-3 rounded-full bg-white/85 border border-white/60 shadow-md flex items-center justify-center text-2xl transition hover:scale-110 hover:shadow-lg hover:bg-white"
-                  >
-                    {p.emoji}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* 2xl: full pill with label (fits ~190px gutter) */}
-            <div
-              className={`hidden 2xl:block fixed ${side === "left" ? "left-3" : "right-3"} top-20 z-10`}
-              style={{ width: 152, height: "calc(100vh - 96px)", overflow: "hidden" }}
-            >
-              <div className={dir} style={{ willChange: "transform" }}>
-                {[...pills, ...pills].map((p, i) => (
+          <div
+            style={{
+              position: "fixed",
+              [side]: wide ? 12 : 8,
+              top: 80,
+              width: wide ? 152 : 48,
+              height: "calc(100vh - 96px)",
+              overflow: "hidden",
+              zIndex: 10,
+            }}
+          >
+            <div className={dir} style={{ willChange: "transform" }}>
+              {[...pills, ...pills].map((p, i) =>
+                wide ? (
                   <button
                     key={i}
                     onClick={() => { setQuery(p.q); handleSearch(p.q); }}
@@ -371,10 +368,19 @@ export default function ChatPage() {
                     <span className="text-xl">{p.emoji}</span>
                     <span>{p.label}</span>
                   </button>
-                ))}
-              </div>
+                ) : (
+                  <button
+                    key={i}
+                    title={p.label}
+                    onClick={() => { setQuery(p.q); handleSearch(p.q); }}
+                    className="w-11 h-11 mb-3 rounded-full bg-white/85 border border-white/60 shadow-md flex items-center justify-center text-2xl transition hover:scale-110 hover:shadow-lg hover:bg-white"
+                  >
+                    {p.emoji}
+                  </button>
+                )
+              )}
             </div>
-          </>
+          </div>
         );
 
         return (
