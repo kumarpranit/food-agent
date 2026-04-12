@@ -25,21 +25,18 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-@keyframes float {
-  0%, 100% { transform: translateY(0px) rotate(-1deg); }
-  50%       { transform: translateY(-14px) rotate(1deg); }
+@keyframes scroll-up {
+  0%   { transform: translateY(0); }
+  100% { transform: translateY(-50%); }
 }
 
-@keyframes float-slow {
-  0%, 100% { transform: translateY(0px) rotate(1deg); }
-  50%       { transform: translateY(-10px) rotate(-2deg); }
+@keyframes scroll-down {
+  0%   { transform: translateY(-50%); }
+  100% { transform: translateY(0); }
 }
 
-@keyframes float-fast {
-  0%, 100% { transform: translateY(0px) rotate(0deg); }
-  50%       { transform: translateY(-18px) rotate(2deg); }
-}
+.scroll-up   { animation: scroll-up   18s linear infinite; }
+.scroll-down { animation: scroll-down 18s linear infinite; }
 
-.float        { animation: float      3.8s ease-in-out infinite; }
-.float-slow   { animation: float-slow 5.2s ease-in-out infinite; }
-.float-fast   { animation: float-fast 2.9s ease-in-out infinite; }
+.scroll-up:hover,
+.scroll-down:hover { animation-play-state: paused; }
