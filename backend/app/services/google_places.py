@@ -106,7 +106,7 @@ def search_nearby_restaurants(
     print("PLACES URL:", PLACES_NEARBY_URL)
     print("PARAMS:", {k: v for k, v in params.items() if k != "key"})
 
-    response = requests.get(PLACES_NEARBY_URL, params=params, timeout=30)
+    response = requests.get(PLACES_NEARBY_URL, params=params, timeout=8)
     response.raise_for_status()
     data = response.json()
 

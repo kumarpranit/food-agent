@@ -28,7 +28,7 @@ def parse_user_query(query: str) -> Dict[str, Any]:
     elif re.search(r"\bmoderate\b|\bmid.range\b|\breasonable\b", text):
         parsed["min_price"] = 1
         parsed["max_price"] = 2
-    elif re.search(r"\bfancy\b|\bexpensive\b|\bupscale\b|\bfine dining\b|\bluxury\b|\bpremium\b", text):
+    elif re.search(r"\bfancy\b|\bexpensive\b|\bupscale\b|\bfine dining\b|\bluxury\b|\bpremium\b|\bdate night\b|\bromantic\b|\banniversary\b|\bspecial occasion\b|\bproposal\b", text):
         parsed["min_price"] = 3
 
     # Place type detection
@@ -41,6 +41,24 @@ def parse_user_query(query: str) -> Dict[str, Any]:
         # Broaden keyword so Google finds brunch spots faster
         if parsed["keyword"].strip() in ("brunch",):
             parsed["keyword"] = "brunch breakfast"
+
+    # Special intent keyword mapping — replace vague phrases with searchable terms
+    INTENT_MAP = {
+        r"\bdate night\b": "romantic dinner",
+        r"\bromantic\b": "romantic dinner",
+        r"\banniversary\b": "fine dining",
+        r"\bspecial occasion\b": "fine dining",
+        r"\bproposal\b": "fine dining",
+        r"\bgroup\b|\bgroup dinner\b|\blarge group\b": "restaurant group dining",
+        r"\bkids\b|\bfamily\b|\bfamily friendly\b": "family restaurant",
+        r"\blate night\b|\bmidnight\b|\b2am\b": "late night food",
+        r"\bquick\b|\bfast\b|\bquick bite\b": "fast food",
+        r"\bwork lunch\b|\bworking lunch\b|\bbusiness lunch\b": "restaurant",
+    }
+    for pattern, replacement in INTENT_MAP.items():
+        if re.search(pattern, text):
+            parsed["keyword"] = replacement
+            break
 
     noise_words = [
         "near me",

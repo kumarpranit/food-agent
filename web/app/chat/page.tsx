@@ -150,6 +150,15 @@ export default function ChatPage() {
     });
   }, []);
 
+  // Keep backend warm — ping every 4 minutes to prevent cold starts
+  useEffect(() => {
+    const ping = () =>
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/health`, { method: "GET" }).catch(() => {});
+    ping(); // immediate ping on load
+    const id = setInterval(ping, 4 * 60 * 1000);
+    return () => clearInterval(id);
+  }, []);
+
   useEffect(() => {
     if (!navigator.geolocation) {
       setLocationDenied(true);
