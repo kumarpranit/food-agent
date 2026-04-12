@@ -78,8 +78,13 @@ def nearby_restaurants(
     parsed = parse_user_query(payload.keyword or "")
 
     radius = payload.radius if payload.radius is not None else parsed["radius"]
-    keyword = parsed["keyword"]
     open_only = parsed["open_now"]
+
+    # Cuisine filter merges with keyword
+    base_keyword = parsed["keyword"]
+    if payload.cuisine:
+        base_keyword = f"{payload.cuisine} {base_keyword}".strip()
+    keyword = base_keyword
 
     # Price level: explicit payload takes priority over NLP-parsed value
     min_price = payload.min_price if payload.min_price is not None else parsed.get("min_price")
@@ -98,9 +103,12 @@ def nearby_restaurants(
         place_type=place_type,
     )
 
-    # ✅ FIX: this filter was outside the function before — now it's in the right place
     if open_only:
         results = [r for r in results if r.get("open_now")]
+
+    # Apply rating filter
+    if payload.min_rating is not None:
+        results = [r for r in results if (r.get("rating") or 0) >= payload.min_rating]
 
     ranked = rank_restaurants(results)
 

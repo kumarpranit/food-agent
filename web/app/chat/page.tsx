@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import type { User } from "@supabase/supabase-js";
 import ChatBot from "./ChatBot";
+import FilterBar, { DEFAULT_FILTERS, type Filters } from "./FilterBar";
 
 type Restaurant = {
   name: string;
@@ -117,7 +118,7 @@ export default function ChatPage() {
   const [locationReady, setLocationReady] = useState(false);
   const [locationDenied, setLocationDenied] = useState(false);
   const [radius] = useState(8047); // fixed 5 miles — not exposed in UI
-  const [openOnly, setOpenOnly] = useState(false);
+  const openOnly = filters.hours === "open_now" || filters.hours === "open_24h";
   const [loading, setLoading] = useState(false);
   const [viewportWidth, setViewportWidth] = useState(0);
 
@@ -127,7 +128,7 @@ export default function ChatPage() {
     window.addEventListener("resize", update);
     return () => window.removeEventListener("resize", update);
   }, []);
-  const [priceLevel, setPriceLevel] = useState<string>("");
+  const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
 
   const [rawResults, setRawResults] = useState<Restaurant[]>([]);
@@ -245,10 +246,10 @@ export default function ChatPage() {
             lng,
             radius,
             keyword: finalQuery,
-            ...(priceLevel === "1" && { min_price: 1, max_price: 1 }),
-            ...(priceLevel === "2" && { min_price: 2, max_price: 2 }),
-            ...(priceLevel === "3" && { min_price: 3, max_price: 3 }),
-            ...(priceLevel === "4" && { min_price: 4, max_price: 4 }),
+            ...(filters.minPrice !== null && { min_price: filters.minPrice }),
+            ...(filters.maxPrice !== null && { max_price: filters.maxPrice }),
+            ...(filters.minRating !== null && { min_rating: filters.minRating }),
+            ...(filters.cuisine !== null && { cuisine: filters.cuisine }),
           }),
         }
       );
@@ -287,15 +288,10 @@ export default function ChatPage() {
 
   const handleQuickSuggestion = (item: string) => {
     if (item.toLowerCase() === "open now") {
-      setOpenOnly(true);
-      if (query.trim()) {
-        handleSearch(query);
-      } else {
-        handleSearch("Open restaurants");
-      }
+      setFilters((f) => ({ ...f, hours: "open_now" }));
+      handleSearch(query.trim() || "Open restaurants");
       return;
     }
-
     setQuery(item);
     handleSearch(item);
   };
@@ -455,28 +451,8 @@ export default function ChatPage() {
         </div>
 
         <section className="rounded-2xl sm:rounded-3xl border border-white/60 bg-white/65 p-4 sm:p-5 shadow-xl shadow-orange-100/50 backdrop-blur-xl">
-          <div className="flex flex-wrap gap-2 sm:gap-3 mb-4">
-            <label className="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-2 sm:px-4 sm:py-3 text-sm shadow-sm cursor-pointer">
-              <input
-                type="checkbox"
-                checked={openOnly}
-                onChange={(e) => setOpenOnly(e.target.checked)}
-                className="h-4 w-4"
-              />
-              <span className="text-gray-700">Open Now</span>
-            </label>
-
-            <select
-              className="rounded-xl border border-gray-200 bg-white px-3 py-2 sm:px-4 sm:py-3 text-sm shadow-sm outline-none transition focus:ring-2 focus:ring-orange-300"
-              value={priceLevel}
-              onChange={(e) => setPriceLevel(e.target.value)}
-            >
-              <option value="">Any Price</option>
-              <option value="1">$ · Budget</option>
-              <option value="2">$$ · Moderate</option>
-              <option value="3">$$$ · Upscale</option>
-              <option value="4">$$$$ · Fine Dining</option>
-            </select>
+          <div className="mb-4">
+            <FilterBar filters={filters} onChange={setFilters} />
           </div>
 
           <div className="flex flex-col gap-2 sm:gap-3 sm:flex-row">
