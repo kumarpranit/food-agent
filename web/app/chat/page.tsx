@@ -310,11 +310,30 @@ export default function ChatPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-amber-100 relative overflow-hidden">
-      {/* Background blobs */}
-      <div className="absolute -top-20 -left-20 h-72 w-72 rounded-full bg-orange-200/30 blur-3xl" />
-      <div className="absolute top-40 right-0 h-80 w-80 rounded-full bg-pink-200/20 blur-3xl" />
-      <div className="absolute bottom-0 left-1/3 h-72 w-72 rounded-full bg-yellow-200/30 blur-3xl" />
+    <main
+      className="min-h-screen relative overflow-hidden"
+      style={{
+        backgroundImage:
+          'url("https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1920&q=80")',
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundAttachment: "fixed",
+      }}
+    >
+      {/* Warm overlay so UI stays readable over the food photo */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            "linear-gradient(135deg, rgba(255,237,213,0.88) 0%, rgba(255,255,255,0.82) 50%, rgba(254,243,199,0.88) 100%)",
+          backdropFilter: "blur(1px)",
+        }}
+      />
+
+      {/* Soft accent blobs on top of overlay */}
+      <div className="absolute -top-20 -left-20 h-72 w-72 rounded-full bg-orange-300/20 blur-3xl" />
+      <div className="absolute top-40 right-0 h-80 w-80 rounded-full bg-pink-300/15 blur-3xl" />
+      <div className="absolute bottom-0 left-1/3 h-72 w-72 rounded-full bg-yellow-300/20 blur-3xl" />
 
       {/* Escalator cuisine strips — rendered via JS width check (bypasses Tailwind responsive issues) */}
       {viewportWidth >= 1280 && (() => {
