@@ -70,6 +70,17 @@ function scoreRestaurant(r: Restaurant) {
   };
 }
 
+function avgSpendForTwo(priceLevel?: number | null): string | null {
+  switch (priceLevel) {
+    case 0: return "Under $10 for 2";
+    case 1: return "$10 – $25 for 2";
+    case 2: return "$25 – $60 for 2";
+    case 3: return "$60 – $120 for 2";
+    case 4: return "$120+ for 2";
+    default: return null;
+  }
+}
+
 function buildRecommendation(items: Restaurant[]) {
   const scored = items.map(scoreRestaurant).sort((a, b) => {
     const scoreDiff = (b.score ?? 0) - (a.score ?? 0);
@@ -487,6 +498,11 @@ export default function ChatPage() {
                     <span className="rounded-full bg-yellow-50 px-3 py-1 text-yellow-700">
                       ⭐ {topPick.rating ?? "N/A"}
                     </span>
+                    {avgSpendForTwo(topPick.price_level) && (
+                      <span className="rounded-full bg-emerald-50 px-3 py-1 text-emerald-700 font-medium">
+                        💰 {avgSpendForTwo(topPick.price_level)}
+                      </span>
+                    )}
                     <span
                       className={`rounded-full px-3 py-1 font-medium ${
                         topPick.open_now === true
@@ -585,6 +601,11 @@ export default function ChatPage() {
                           <span className="rounded-full bg-yellow-50 px-3 py-1 text-yellow-700">
                             ⭐ {r.rating ?? "N/A"}
                           </span>
+                          {avgSpendForTwo(r.price_level) && (
+                            <span className="rounded-full bg-emerald-50 px-3 py-1 text-emerald-700 font-medium">
+                              💰 {avgSpendForTwo(r.price_level)}
+                            </span>
+                          )}
                           <span
                             className={`rounded-full px-3 py-1 font-medium ${
                               r.open_now === true
