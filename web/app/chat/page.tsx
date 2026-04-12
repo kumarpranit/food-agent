@@ -325,8 +325,7 @@ export default function ChatPage() {
         className="absolute inset-0"
         style={{
           background:
-            "linear-gradient(135deg, rgba(255,237,213,0.88) 0%, rgba(255,255,255,0.82) 50%, rgba(254,243,199,0.88) 100%)",
-          backdropFilter: "blur(1px)",
+            "linear-gradient(135deg, rgba(255,237,213,0.75) 0%, rgba(255,255,255,0.70) 50%, rgba(254,243,199,0.75) 100%)",
         }}
       />
 
